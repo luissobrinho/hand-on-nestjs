@@ -58,7 +58,7 @@ Alternatively, rather than passing a configuration object to `forRoot()`, we can
   "port": 3306,
   "username": "root",
   "password": "",
-  "database": "hand-on",
+  "database": "{{hand-on}}",
   "entities": ["dist/**/*.entity{.ts,.js}"],
   "synchronize": true
 }
@@ -72,6 +72,44 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [TypeOrmModule.forRoot()],
 })
 export class AppModule {}
+```
+
+### Module Cat
+To demonstrate this, we'll create the CatsModule.
+```bash
+$ nest g module cats
+```
+
+```typescript
+import { Module } from '@nestjs/common';
+import { CatsService } from './cats.service';
+import { CatsController } from './cats.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Cat } from './entities/cat.entity';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([Cat])],
+  controllers: [CatsController],
+  providers: [CatsService],
+})
+export class CatsModule {}
+```
+Above, we defined the CatsModule in the `cats.module.ts file, and moved everything related to this module into the cats directory. The last thing we need to do is import this module into the root module (the AppModule, defined in the app.module.ts file).
+```typescript
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { CatsModule } from './cats/cats.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+@Module({
+  imports: [
+    CatsModule,
+    TypeOrmModule.forRoot(),
+  ],
+  controllers: [AppController],
+})
+export class AppModule {}
+
 ```
 
 ### Repository pattern
@@ -272,44 +310,6 @@ export class CatsService {
     return this.catRepository.delete({ id });
   }
 }
-
-```
-
-### Module Cat
-To demonstrate this, we'll create the CatsModule.
-```bash
-$ nest g module cats
-```
-
-```typescript
-import { Module } from '@nestjs/common';
-import { CatsService } from './cats.service';
-import { CatsController } from './cats.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Cat } from './entities/cat.entity';
-
-@Module({
-  imports: [TypeOrmModule.forFeature([Cat])],
-  controllers: [CatsController],
-  providers: [CatsService],
-})
-export class CatsModule {}
-```
-Above, we defined the CatsModule in the `cats.module.ts file, and moved everything related to this module into the cats directory. The last thing we need to do is import this module into the root module (the AppModule, defined in the app.module.ts file).
-```typescript
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { CatsModule } from './cats/cats.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-
-@Module({
-  imports: [
-    CatsModule,
-    TypeOrmModule.forRoot(),
-  ],
-  controllers: [AppController],
-})
-export class AppModule {}
 
 ```
 
